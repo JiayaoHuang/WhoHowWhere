@@ -63,6 +63,10 @@ public class Deck {
         return deck;
     }
 
+    public int getNumCardsInDeck() {
+        return cards.size();
+    }
+
     public List<Card> getCards() {
         return cards;
     }
