@@ -1,5 +1,6 @@
 package ca.cary.whohowwhere.adapter;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -16,7 +17,8 @@ import java.util.List;
 
 import ca.cary.whohowwhere.R;
 import ca.cary.whohowwhere.callback.OnNumCardsLeftChangedListener;
-import ca.cary.whohowwhere.dao.Candidate;
+import ca.cary.whohowwhere.model.Candidate;
+import ca.cary.whohowwhere.dialog.EditDialog;
 
 /**
  * Created by jiayaohuang on 2017-11-26.
@@ -24,11 +26,16 @@ import ca.cary.whohowwhere.dao.Candidate;
 
 public class AddPlayerAdapter extends ArrayAdapter<Candidate> {
 
+    public static final String TAG = AddPlayerAdapter.class.getName();
+
+    private FragmentManager fragmentManager;
     private OnNumCardsLeftChangedListener listener;
 
-    public AddPlayerAdapter(@NonNull Context context, List<Candidate> objects, OnNumCardsLeftChangedListener listener) {
+    public AddPlayerAdapter(@NonNull Context context, FragmentManager fragmentManager,
+                            List<Candidate> objects, OnNumCardsLeftChangedListener listener) {
         super(context, 0, objects);
 
+        this.fragmentManager = fragmentManager;
         this.listener = listener;
     }
 
@@ -62,19 +69,36 @@ public class AddPlayerAdapter extends ArrayAdapter<Candidate> {
         viewHolder.playerName.setText(candidate.getName());
         viewHolder.cardNum.setText(String.valueOf(candidate.getNumCardsAtStart()));
 
-        viewHolder.playerName.addTextChangedListener(new TextWatcher() {
+        viewHolder.playerName.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onClick(View view) {
+                final EditDialog editDialog = new EditDialog();
+                editDialog.setContent(candidate.getName(),
+                        new TextWatcher() {
+                            @Override
+                            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            }
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+                            @Override
+                            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                            }
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                candidate.setName(editable.toString());
+                            @Override
+                            public void afterTextChanged(Editable editable) {
+                                candidate.setName(editable.toString());
+
+                                notifyDataSetChanged();
+                            }
+                        },
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                editDialog.dismiss();
+                            }
+                        });
+                editDialog.show(fragmentManager, TAG);
             }
         });
-
         viewHolder.sub.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

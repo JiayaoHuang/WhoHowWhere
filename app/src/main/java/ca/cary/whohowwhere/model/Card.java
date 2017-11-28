@@ -1,4 +1,6 @@
-package ca.cary.whohowwhere.dao;
+package ca.cary.whohowwhere.model;
+
+import ca.cary.whohowwhere.data.CardType;
 
 /**
  * Created by jiayaohuang on 2017-11-26.
@@ -7,7 +9,6 @@ package ca.cary.whohowwhere.dao;
 public class Card {
 
     private String name;
-
     private CardType cardType;
 
     public Card(String name, CardType cardType) {

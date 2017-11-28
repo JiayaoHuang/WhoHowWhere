@@ -1,4 +1,4 @@
-package ca.cary.whohowwhere.dao;
+package ca.cary.whohowwhere.model;
 
 /**
  * Created by jiayaohuang on 2017-11-26.

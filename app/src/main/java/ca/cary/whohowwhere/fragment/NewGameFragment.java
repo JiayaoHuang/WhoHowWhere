@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -15,8 +16,8 @@ import java.util.List;
 import ca.cary.whohowwhere.R;
 import ca.cary.whohowwhere.adapter.AddPlayerAdapter;
 import ca.cary.whohowwhere.callback.OnNumCardsLeftChangedListener;
-import ca.cary.whohowwhere.dao.Candidate;
-import ca.cary.whohowwhere.dao.Deck;
+import ca.cary.whohowwhere.model.Candidate;
+import ca.cary.whohowwhere.data.Deck;
 
 /**
  * Created by jiayaohuang on 2017-11-26.
@@ -30,6 +31,8 @@ public class NewGameFragment extends Fragment implements OnNumCardsLeftChangedLi
 
     private TextView numCardLeft;
     private ListView playerList;
+    private Button removePlayer;
+    private Button startGame;
 
     private Deck deck;
     private List<Candidate> candidates;
@@ -47,15 +50,21 @@ public class NewGameFragment extends Fragment implements OnNumCardsLeftChangedLi
 
         numCardLeft = view.findViewById(R.id.numCardLeft);
         playerList = view.findViewById(R.id.playerList);
+        removePlayer = view.findViewById(R.id.removePlayer);
+        startGame = view.findViewById(R.id.startGame);
 
         numCardLeft.setText(String.valueOf(Candidate.getNumCardsLeft()));
 
-        AddPlayerAdapter adapter = new AddPlayerAdapter(getActivity(), candidates, this);
+        if (candidates.size() <= MIN_PLAYER) {
+            removePlayer.setEnabled(false);
+        }
+
+        AddPlayerAdapter adapter = new AddPlayerAdapter(getActivity(), getFragmentManager(), candidates, this);
         playerList.setAdapter(adapter);
-        playerList.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
 
         view.findViewById(R.id.addPlayer).setOnClickListener(this);
-        view.findViewById(R.id.startGame).setOnClickListener(this);
+        removePlayer.setOnClickListener(this);
+        startGame.setOnClickListener(this);
 
         return view;
     }
@@ -63,6 +72,12 @@ public class NewGameFragment extends Fragment implements OnNumCardsLeftChangedLi
     @Override
     public void onNumCardsLeftChanged() {
         numCardLeft.setText(String.valueOf(Candidate.getNumCardsLeft()));
+
+        if (Candidate.getNumCardsLeft() == 0) {
+            startGame.setEnabled(true);
+        } else {
+            startGame.setEnabled(false);
+        }
     }
 
     @Override
@@ -74,6 +89,33 @@ public class NewGameFragment extends Fragment implements OnNumCardsLeftChangedLi
 
                 numCardLeft.setText(String.valueOf(Candidate.getNumCardsLeft()));
                 ((BaseAdapter) playerList.getAdapter()).notifyDataSetChanged();
+
+                if (candidates.size() > MIN_PLAYER) {
+                    removePlayer.setEnabled(true);
+                }
+
+                if (Candidate.getNumCardsLeft() == 0) {
+                    startGame.setEnabled(true);
+                } else {
+                    startGame.setEnabled(false);
+                }
+                break;
+            case R.id.removePlayer:
+                candidates.remove(candidates.size() - 1);
+                recalculateNumCardsPerCandidate();
+
+                numCardLeft.setText(String.valueOf(Candidate.getNumCardsLeft()));
+                ((BaseAdapter) playerList.getAdapter()).notifyDataSetChanged();
+
+                if (candidates.size() <= MIN_PLAYER) {
+                    removePlayer.setEnabled(false);
+                }
+
+                if (Candidate.getNumCardsLeft() == 0) {
+                    startGame.setEnabled(true);
+                } else {
+                    startGame.setEnabled(false);
+                }
                 break;
             case R.id.startGame:
                 break;

@@ -17,7 +17,9 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp" />
+        android:layout_marginRight="5dp"
+        android:inputType="none"
+        android:focusable="false" />
 
     <Button
         android:id="@+id/sub"

@@ -1,10 +1,9 @@
-package ca.cary.whohowwhere.dao;
+package ca.cary.whohowwhere.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import ca.cary.whohowwhere.data.CardSet;
+import ca.cary.whohowwhere.model.Card;
 
 /**
  * Created by jiayaohuang on 2017-11-26.
@@ -18,7 +17,6 @@ public class Deck {
     private List<Card> suspectCards;
     private List<Card> toolCards;
     private List<Card> locationCards;
-    private HashMap<String, Card> cardHashMap;
 
     private Deck() {}
 
@@ -27,14 +25,12 @@ public class Deck {
         suspectCards = new ArrayList<>();
         toolCards = new ArrayList<>();
         locationCards = new ArrayList<>();
-        cardHashMap = new HashMap<>();
 
         // Suspects
         for (String suspect : CardSet.getSuspects()) {
             Card card = new Card(suspect, CardType.SUSPECT);
             cards.add(card);
             suspectCards.add(card);
-            cardHashMap.put(suspect, card);
         }
 
         // Tools
@@ -42,7 +38,6 @@ public class Deck {
             Card card = new Card(tool, CardType.TOOL);
             cards.add(card);
             toolCards.add(card);
-            cardHashMap.put(tool, card);
         }
 
         // Locations
@@ -50,7 +45,6 @@ public class Deck {
             Card card = new Card(location, CardType.LOCATION);
             cards.add(card);
             locationCards.add(card);
-            cardHashMap.put(location, card);
         }
     }
 
@@ -81,10 +75,6 @@ public class Deck {
 
     public List<Card> getLocationCards() {
         return locationCards;
-    }
-
-    public HashMap<String, Card> getCardHashMap() {
-        return cardHashMap;
     }
 
 }

@@ -34,7 +34,8 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:text="NO" />
+            android:text="NO"
+            android:background="?android:selectableItemBackground" />
 
         <View
             android:layout_width="1dp"
@@ -51,7 +52,8 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:text="YES" />
+            android:text="YES"
+            android:background="?android:selectableItemBackground" />
 
     </LinearLayout>
 
