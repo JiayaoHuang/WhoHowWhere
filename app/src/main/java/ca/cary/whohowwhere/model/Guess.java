@@ -6,17 +6,13 @@ package ca.cary.whohowwhere.model;
 
 public class Guess {
 
-    private Card suspectCard;
-    private Card toolCard;
-    private Card locationCard;
-    private Player suggest;
+    private final Combo combo;
+    private final Player suggest;
     private Player shown;
     private boolean solved;
 
-    public Guess(Card suspectCard, Card toolCard, Card locationCard, Player suggest) {
-        this.suspectCard = suspectCard;
-        this.toolCard = toolCard;
-        this.locationCard = locationCard;
+    public Guess(Combo combo, Player suggest) {
+        this.combo = combo;
         this.suggest = suggest;
         this.solved = false;
     }
@@ -29,16 +25,8 @@ public class Guess {
         solved = true;
     }
 
-    public Card getSuspectCard() {
-        return suspectCard;
-    }
-
-    public Card getToolCard() {
-        return toolCard;
-    }
-
-    public Card getLocationCard() {
-        return locationCard;
+    public Combo getCombo() {
+        return combo;
     }
 
     public Player getSuggest() {

@@ -2,7 +2,8 @@ package ca.cary.whohowwhere.model;
 
 import android.util.Log;
 
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by jiayaohuang on 2017-11-26.
@@ -14,66 +15,81 @@ public class Player {
     private final String name;
     private final int numCardsInHand;
 
-    private HashMap<String, Card> cardsInHand;
-    private HashMap<String, Card> cardsMayInHand;
-    private HashMap<String, Card> cardsNotInHand;
+    private HashSet<Card> cardsInHand;
+    private List<UnclearPossess> unclearPossesses;
+    private HashSet<Card> cardsNotInHand;
+    private List<Possibility> possibilities;
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Player)) {
+            return false;
+        }
+
+        Player player = (Player) object;
+
+        return id == player.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 
     public Player(int id, String name, int numCardsInHand) {
         this.id = id;
         this.name = name;
         this.numCardsInHand = numCardsInHand;
 
-        cardsInHand = new HashMap<>();
-        cardsMayInHand = new HashMap<>();
-        cardsNotInHand = new HashMap<>();
+        cardsInHand = new HashSet<>();
+        unclearPossesses = null;
+        cardsNotInHand = new HashSet<>();
+        possibilities = null;
     }
 
-    void addCardsInHand(Card card) {
-        if (cardsNotInHand.containsKey(card.getName())) {
-            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined not having by this player: \"" + id + "/" + name + "\"");
+    void addCardsInHand(final Card card) {
+        if (cardsNotInHand.contains(card)) {
+            Log.e("ERROR", "Player: \"" + id + "/" + name + "\" already defined not owning Card: \"" + card.getName() + "\"");
             return;
-        } else if (cardsInHand.containsKey(card.getName())) {
-            Log.i("INFO", "Card: \"" + card.getName() + "\" already defined having by this player: \"" + id + "/" + name + "\"");
+        } else if (cardsInHand.contains(card)) {
+            Log.i("INFO", "Player: \"" + id + "/" + name + "\" already defined owning Card: \"" + card.getName() + "\"");
             return;
-        } else if (cardsInHand.keySet().size() >= numCardsInHand) {
-            Log.e("ERROR", "Card limit exceeded for this player: \"" + id + "/" + name + "\"");
+        } else if (cardsInHand.size() >= numCardsInHand) {
+            Log.e("ERROR", "Player: \"" + id + "/" + name + "\" Card Limit exceeded");
             return;
         }
 
-        cardsInHand.put(card.getName(), card);
-
-        if (cardsMayInHand.containsKey(card.getName())) {
-            cardsMayInHand.remove(card.getName());
-        }
+        cardsInHand.add(card);
     }
 
-    void addCardsMayInHand(Card card) {
-        if (cardsNotInHand.containsKey(card.getName())) {
-            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined not having by this player: \"" + id + "/" + name + "\"");
-            return;
-        } else if (cardsInHand.containsKey(card.getName())) {
-            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined having by this player: \"" + id + "/" + name + "\"");
+    void setUnclearPossesses(final List<UnclearPossess> unclearPossesses) {
+        if (cardsInHand.size() >= numCardsInHand) {
+            Log.e("ERROR", "Player: \"" + id + "/" + name + "\" Card Limit exceeded");
             return;
         }
 
-        if (!cardsMayInHand.containsKey(card.getName())) {
-            cardsMayInHand.put(card.getName(), card);
-        }
+        this.unclearPossesses = unclearPossesses;
     }
 
     void addCardsNotInHand(final Card card) {
-        if (cardsInHand.containsKey(card.getName())) {
-            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined having by this player: \"" + id + "/" + name + "\"");
+        if (cardsInHand.contains(card)) {
+            Log.e("ERROR", "Player: \"" + id + "/" + name + "\" already defined owning Card: \"" + card.getName() + "\"");
+            return;
+        } else if (cardsNotInHand.contains(card)) {
+            Log.i("INFO", "Player: \"" + id + "/" + name + "\" already defined not owning Card: \"" + card.getName() + "\"");
             return;
         }
 
-        if (!cardsNotInHand.containsKey(card.getName())) {
-            cardsNotInHand.put(card.getName(), card);
+        cardsNotInHand.add(card);
+    }
+
+    void setPossibilities(final List<Possibility> possibilities) {
+        if (cardsInHand.size() >= numCardsInHand) {
+            Log.e("ERROR", "Player: \"" + id + "/" + name + "\" Card Limit exceeded");
+            return;
         }
 
-        if (cardsMayInHand.containsKey(card.getName())) {
-            cardsMayInHand.remove(card.getName());
-        }
+        this.possibilities = possibilities;
     }
 
     public int getId() {
@@ -88,16 +104,20 @@ public class Player {
         return numCardsInHand;
     }
 
-    public HashMap<String, Card> getCardsInHand() {
+    public HashSet<Card> getCardsInHand() {
         return cardsInHand;
     }
 
-    public HashMap<String, Card> getCardsMayInHand() {
-        return cardsMayInHand;
+    public List<UnclearPossess> getUnclearPossesses() {
+        return unclearPossesses;
     }
 
-    public HashMap<String, Card> getCardsNotInHand() {
+    public HashSet<Card> getCardsNotInHand() {
         return cardsNotInHand;
+    }
+
+    public List<Possibility> getPossibilities() {
+        return possibilities;
     }
 
 }

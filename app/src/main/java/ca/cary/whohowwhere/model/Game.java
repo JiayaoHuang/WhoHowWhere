@@ -1,4 +1,4 @@
-package ca.cary.whohowwhere.core;
+package ca.cary.whohowwhere.model;
 
 import android.util.Log;
 
@@ -6,11 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import ca.cary.whohowwhere.model.Card;
 import ca.cary.whohowwhere.data.Deck;
-import ca.cary.whohowwhere.model.CardState;
-import ca.cary.whohowwhere.model.Guess;
-import ca.cary.whohowwhere.model.Player;
 
 /**
  * Created by jiayaohuang on 2017-11-26.

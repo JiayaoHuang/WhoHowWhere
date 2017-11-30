@@ -2,7 +2,7 @@ package ca.cary.whohowwhere.model;
 
 import android.util.Log;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -16,78 +16,83 @@ public class CardState {
     private final Card card;
 
     private Player owned;
-    private HashMap<Integer, Player> mayOwnPlayers;
-    private HashMap<Integer, Player> notOwnPlayers;
+    private List<UnclearPossess> unclearPossesses;
+    private HashSet<Player> notOwnPlayers;
+    private List<Possibility> possibilities;
 
-    public CardState(Card card) {
+    CardState(Card card) {
         this.card = card;
 
         this.owned = null;
-        mayOwnPlayers = new HashMap<>();
-        notOwnPlayers = new HashMap<>();
+        unclearPossesses = null;
+        notOwnPlayers = new HashSet<>();
+        possibilities = null;
     }
 
-    public static void setNumPlayers(int numPlayers) {
+    static void setNumPlayers(int numPlayers) {
         CardState.numPlayers = numPlayers;
     }
 
-    public void setOwned(int ownId, List<Player> players) {
+    public void setOwned(final Player owner) {
         if (owned != null) {
-            Log.e("ERROR", "Player: \"" + owned.getId() + "/" + owned.getName() + "\" already defined owning this card: \"" + card.getName() + "\"");
+            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined owning by Player: \"" + owned.getId() + "/" + owned.getName() + "\"");
             return;
-        } else if (notOwnPlayers.containsKey(ownId)) {
-            Log.e("ERROR", "Player: \"" + ownId + "/" + notOwnPlayers.get(ownId).getName() + "\" already defined not owning this card: \"" + card.getName() + "\"");
+        } else if (notOwnPlayers.contains(owner)) {
+            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined not owning by Player: \"" + owner.getId() + "/" + owner.getName()  + "\"");
             return;
         }
 
-        mayOwnPlayers.clear();
+        owned = owner;
+        owner.addCardsInHand(card);
 
+        unclearPossesses = null;
+        possibilities = null;
+
+        List<Player> players = Game.getGame().getPlayers();
         for (Player player : players) {
-            if (player.getId() == ownId) {
-                owned = player;
-
-                player.addCardsInHand(card);
-            } else if (!notOwnPlayers.containsKey(player.getId())) {
-                notOwnPlayers.put(player.getId(), player);
-
+            if (!player.equals(owner) && !notOwnPlayers.contains(player)) {
+                notOwnPlayers.add(player);
                 player.addCardsNotInHand(card);
             }
         }
     }
 
-    public void addMayOwnPlayer(Player player) {
+    public void setUnclearPossesses(List<UnclearPossess> unclearPossesses) {
         if (owned != null) {
-            Log.e("ERROR", "Player: \"" + owned.getId() + "/" + owned.getName() + "\" already defined owning this card: \"" + card.getName() + "\"");
+            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined owning by Player: \"" + owned.getId() + "/" + owned.getName() + "\"");
             return;
-        } else if (notOwnPlayers.containsKey(player.getId())) {
-            Log.e("ERROR", "Player: \"" + player.getId() + "/" + player.getName() + "\" already defined not having this card: \"" + card.getName() + "\"");
+        } else if (notOwnPlayers.size() >= numPlayers) {
+            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined not owning by any Player in Game");
             return;
         }
 
-        if (!mayOwnPlayers.containsKey(player.getId())) {
-            mayOwnPlayers.put(player.getId(), player);
-
-            player.addCardsMayInHand(card);
-        }
+        this.unclearPossesses = unclearPossesses;
     }
     
     public void addNotOwnPlayers(List<Player> players) {
         if (owned != null) {
-            Log.e("ERROR", "Player: \"" + owned.getId() + "/" + owned.getName() + "\" already defined owning this card: \"" + card.getName() + "\"");
+            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined owning by Player: \"" + owned.getId() + "/" + owned.getName() + "\"");
             return;
         }
 
         for (Player player : players) {
-            if (!notOwnPlayers.containsKey(player.getId())) {
-                notOwnPlayers.put(player.getId(), player);
-
+            if (!notOwnPlayers.contains(player)) {
+                notOwnPlayers.add(player);
                 player.addCardsNotInHand(card);
             }
-
-            if (mayOwnPlayers.containsKey(player.getId())) {
-                mayOwnPlayers.remove(player.getId());
-            }
         }
+    }
+
+    public void setPossibilities(List<Possibility> possibilities) {
+        if (owned != null) {
+            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined owning by Player: \"" + owned.getId() + "/" + owned.getName() + "\"");
+            return;
+        } else if (notOwnPlayers.size() >= numPlayers) {
+            Log.e("ERROR", "Card: \"" + card.getName() + "\" already defined not owning by any Player in Game");
+            return;
+        }
+
+        this.possibilities = possibilities;
     }
 
     public boolean isOwned() {
@@ -95,7 +100,7 @@ public class CardState {
     }
 
     public boolean isTarget() {
-        return notOwnPlayers.keySet().size() == numPlayers;
+        return notOwnPlayers.size() >= numPlayers;
     }
 
     public Card getCard() {
@@ -106,12 +111,16 @@ public class CardState {
         return owned;
     }
 
-    public HashMap<Integer, Player> getMayOwnPlayers() {
-        return mayOwnPlayers;
+    public List<UnclearPossess> getUnclearPossesses() {
+        return unclearPossesses;
     }
 
-    public HashMap<Integer, Player> getNotOwnPlayers() {
+    public HashSet<Player> getNotOwnPlayers() {
         return notOwnPlayers;
+    }
+
+    public List<Possibility> getPossibilities() {
+        return possibilities;
     }
 
 }
